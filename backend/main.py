@@ -8,6 +8,7 @@ from datetime import datetime
 from config import settings, get_settings
 from database import init_db, get_db
 from schemas import SuccessResponse, ErrorResponse
+from tasks.scheduled_tasks import get_scheduler, start_scheduler, stop_scheduler
 import models
 
 # Configure logging
@@ -21,9 +22,24 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Domain Finder Pro...")
     init_db()
     logger.info("Database initialized")
+
+    # Start scheduled tasks
+    try:
+        db_session = next(get_db())
+        start_scheduler(db_session)
+        logger.info("Scheduled tasks started")
+    except Exception as e:
+        logger.warning(f"Could not start scheduler: {e}")
+
     yield
+
     # Shutdown
     logger.info("Shutting down Domain Finder Pro...")
+    try:
+        stop_scheduler()
+        logger.info("Scheduled tasks stopped")
+    except Exception as e:
+        logger.warning(f"Error stopping scheduler: {e}")
 
 # Create FastAPI app
 app = FastAPI(
@@ -266,6 +282,46 @@ def export_portfolio_csv(db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error exporting portfolio",
         )
+
+# ===== Admin/Debug Endpoints =====
+
+@app.post("/api/admin/manual-scrape")
+def manual_scrape_trigger(db: Session = Depends(get_db)):
+    """
+    Manually trigger daily scrape job (for testing)
+
+    WARNING: Only use for development/testing
+    """
+    from tasks.scheduled_tasks import TaskScheduler
+
+    try:
+        TaskScheduler.daily_scrape_job(db)
+        return {
+            "success": True,
+            "message": "Manual scrape job completed",
+        }
+    except Exception as e:
+        logger.error(f"Manual scrape error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Scrape failed: {str(e)}",
+        )
+
+@app.get("/api/scheduler/status")
+def scheduler_status():
+    """Get scheduler status"""
+    scheduler = get_scheduler()
+    return {
+        "running": scheduler.is_running,
+        "jobs": [
+            {
+                "id": job.id,
+                "name": job.name,
+                "next_run_time": job.next_run_time.isoformat() if job.next_run_time else None,
+            }
+            for job in scheduler.scheduler.get_jobs()
+        ] if scheduler.is_running else [],
+    }
 
 # Root endpoint
 @app.get("/")
