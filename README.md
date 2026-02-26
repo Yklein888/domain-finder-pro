@@ -37,76 +37,113 @@ Discover, analyze, and track high-potential domains for investment. Automated da
 
 ## 🚀 Tech Stack
 
-- **Backend:** FastAPI (Python)
-- **Database:** PostgreSQL (Supabase/DigitalOcean)
-- **Scraping:** Apify API
-- **APIs:** RDAP (free), WhoisJSON, Wayback Machine
-- **Frontend:** React/Vue + Tailwind CSS
-- **Deployment:** DigitalOcean / Vercel
+- **Backend:** FastAPI 0.104+ with Uvicorn/Gunicorn
+- **Database:** PostgreSQL 15+ (Supabase/DigitalOcean/Self-hosted)
+- **ORM:** SQLAlchemy 2.0 with Pydantic 2.0
+- **Scheduling:** APScheduler (daily scraping, cleanup jobs)
+- **Scraping:** Apify API (production) + local sample data
+- **APIs:** RDAP (free), WhoisJSON (1000 free calls/month), Wayback Machine
+- **Frontend:** Vanilla HTML/CSS/JavaScript with Bootstrap 5
+- **Reverse Proxy:** Nginx
+- **Containerization:** Docker & Docker Compose
+- **CI/CD:** GitHub Actions (scheduled workflows)
+- **Deployment:** Vercel, Google Cloud Run, DigitalOcean, self-hosted
+- **Notifications:** SendGrid (email), Slack (webhooks)
 
 ---
 
 ## 🛠️ Quick Start
 
-```bash
-# Clone & Setup
-git clone https://github.com/yourusername/domain-finder-pro.git
-cd domain-finder-pro/backend
+### Local Development (Recommended)
 
-# Install dependencies
+```bash
+# Clone repository
+git clone https://github.com/yourusername/domain-finder-pro.git
+cd domain-finder-pro
+
+# Option 1: Docker Compose (easiest)
+docker-compose up -d
+# Backend: http://localhost:8000
+# Frontend: http://localhost:8080 (or open frontend/index.html)
+
+# Option 2: Manual setup
+cd backend
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-# Configure
-cp .env.example .env
-# Edit .env with your database URL and API keys
+# Configure environment
+cp ../.env.example ../.env
+# Edit ../.env with your database URL and API keys
 
 # Initialize database
 python -c "from database import init_db; init_db()"
 
-# Run server
+# Run backend server
 uvicorn main:app --reload
+# API docs: http://localhost:8000/docs
+
+# In another terminal, serve frontend
+cd ../frontend
+python -m http.server 8080
+# Dashboard: http://localhost:8080
 ```
 
-**Access at:** http://localhost:8000/docs
+### Production Deployment
+
+```bash
+# See DEPLOYMENT.md for detailed instructions
+# Quick options:
+# - Vercel (frontend) + Cloud Run (backend)
+# - DigitalOcean App Platform
+# - Self-hosted DigitalOcean Droplet
+# - Docker on any cloud provider
+```
 
 ---
 
 ## 📋 Implementation Status
 
-### Week 1: Backend Foundation ✅
-- [x] FastAPI setup
-- [x] PostgreSQL models
-- [x] Database layer
-- [x] API schemas
+### Week 1: Backend Foundation ✅ COMPLETED
+- [x] FastAPI setup with lifespan management
+- [x] PostgreSQL models (Domain, PortfolioItem, Alert, DomainScore)
+- [x] Database layer with connection pooling
+- [x] Pydantic API schemas with validation
 - [x] Health check endpoints
-- [ ] Integration tests
+- [x] CRUD endpoints for domains and portfolio
 
-### Week 2: Scraper & Analysis (In Progress)
-- [ ] Apify scraper integration
-- [ ] RDAP analyzer
-- [ ] Backlink analyzer
-- [ ] Domain scorer
-- [ ] APScheduler setup
+### Week 2: Scraper & Analysis ✅ COMPLETED
+- [x] Domain Scorer: 0-100 intelligent scoring (6 factors)
+- [x] Backlink Analyzer: RDAP + WhoisJSON + Wayback Machine
+- [x] Apify scraper with sample data fallback
+- [x] APScheduler: Daily 9 AM UTC + weekly cleanup
+- [x] Comprehensive test suite with sample data
 
-### Week 3: API Routes & Integration
-- [ ] Domain endpoints
-- [ ] Portfolio endpoints
-- [ ] Export endpoints
-- [ ] Alert endpoints
+### Week 3: API Routes & Integration ✅ COMPLETED
+- [x] Domain endpoints (list, top, details, add)
+- [x] Portfolio endpoints (CRUD, summary, stats)
+- [x] CSV export endpoints (3 formats)
+- [x] Scoring service orchestration
+- [x] Alert service (Email + Slack)
+- [x] Error handling and validation
 
-### Week 4: Frontend Dashboard
-- [ ] Opportunities view
-- [ ] Portfolio manager
-- [ ] Export feature
-- [ ] Settings page
+### Week 4: Frontend Dashboard ✅ COMPLETED
+- [x] Responsive HTML/CSS/JS dashboard
+- [x] Top opportunities view with filters
+- [x] Portfolio manager with CRUD
+- [x] CSV export interface (3 formats)
+- [x] Settings and API configuration
+- [x] Real-time stats and metrics
+- [x] Mobile-optimized design
 
-### Week 5: Automation & Deployment
-- [ ] GitHub Actions workflow
-- [ ] Docker setup
-- [ ] Production deployment
-- [ ] Monitoring & logging
+### Week 5: Automation & Deployment ✅ COMPLETED
+- [x] GitHub Actions workflow (daily at 9 AM UTC)
+- [x] Docker & Docker Compose setup
+- [x] Production deployment guide
+- [x] Nginx reverse proxy configuration
+- [x] Multiple deployment options
+- [x] Environment configuration templates
+- [x] Scaling and troubleshooting guides
 
 ---
 
