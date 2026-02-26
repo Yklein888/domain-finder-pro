@@ -1,0 +1,50 @@
+# Cloud Build configuration for Google Cloud Run
+# Automatically builds and deploys on git push
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/domain-finder-pro:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/domain-finder-pro:latest'
+      - '.'
+
+  # Step 2: Push to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/domain-finder-pro:$SHORT_SHA'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - run
+      - --filename=k8s/
+      - --image=gcr.io/$PROJECT_ID/domain-finder-pro:$SHORT_SHA
+      - --location=us-central1
+
+  # Step 4: Deploy to Cloud Run (simpler method)
+  - name: 'gcr.io/cloud-builders/run'
+    args:
+      - 'deploy'
+      - 'domain-finder-pro'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/domain-finder-pro:$SHORT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'DATABASE_URL=$_DATABASE_URL,APIFY_TOKEN=$_APIFY_TOKEN'
+
+# Use Cloud Run instead
+onFailure:
+  - 'gcloud run deploy'
+
+substitutions:
+  _DATABASE_URL: ${DATABASE_URL}
+  _APIFY_TOKEN: ${APIFY_TOKEN}
