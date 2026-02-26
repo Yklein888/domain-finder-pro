@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Finder Pro - Domain Investment Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2196F3;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --warning: #FF9800;
+            --info: #00BCD4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, var(--primary) 0%, #1976D2 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+            min-height: calc(100vh - 60px);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, var(--primary), #1976D2);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1.5rem;
+            font-weight: 600;
+            border: none;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-box h3 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .stat-box p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .grade-badge {
+            font-weight: 700;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .grade-a { background: #E8F5E9; color: #2E7D32; }
+        .grade-b { background: #E3F2FD; color: #1565C0; }
+        .grade-c { background: #FFF3E0; color: #E65100; }
+        .grade-d { background: #FCE4EC; color: #C2185B; }
+        .grade-e { background: #F3E5F5; color: #6A1B9A; }
+        .grade-f { background: #FFEBEE; color: #B71C1C; }
+
+        .domain-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .domain-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left-color: var(--success);
+        }
+
+        .domain-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .domain-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            color: #999;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #1565C0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .roi-badge {
+            background: var(--success);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 2rem;
+        }
+
+        .nav-link {
+            color: #666;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+
+        .portfolio-summary {
+            background: linear-gradient(135deg, var(--primary), #1976D2);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .portfolio-stat {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .portfolio-stat h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .portfolio-stat .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table th {
+            background: #f5f5f5;
+            border: none;
+            padding: 1.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 1.25rem;
+        }
+
+        .alert-success {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .alert-danger {
+            background: #FFEBEE;
+            color: #C2185B;
+        }
+
+        .footer {
+            background: rgba(0,0,0,0.1);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .domain-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .card-header {
+                padding: 1rem;
+            }
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(90deg, var(--primary), #1976D2);
+            color: white;
+            border: none;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 0.6rem 0.9rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark">
+        <div class="container-lg">
+            <span class="navbar-brand">
+                <i class="fas fa-globe"></i> Domain Finder Pro
+            </span>
+            <div class="text-white">
+                <small>Automated Domain Discovery & Investment Analysis</small>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="container-lg">
+            <!-- Overview Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-box">
+                        <i class="fas fa-globe" style="font-size: 2rem; color: var(--primary);"></i>
+                        <h3 id="total-domains">-</h3>
+                        <p>Total Domains Analyzed</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-box">
+                        <i class="fas fa-briefcase" style="font-size: 2rem; color: var(--success);"></i>
+                        <h3 id="portfolio-count">0</h3>
+                        <p>Portfolio Items</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-box">
+                        <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--warning);"></i>
+                        <h3 id="portfolio-roi">0%</h3>
+                        <p>Potential ROI</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-box">
+                        <i class="fas fa-dollar-sign" style="font-size: 2rem; color: var(--danger);"></i>
+                        <h3 id="portfolio-value">$0</h3>
+                        <p>Est. Portfolio Value</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav-tabs d-flex flex-wrap" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-tab="opportunities" onclick="switchTab('opportunities')">
+                        <i class="fas fa-star"></i> Top Opportunities
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-tab="portfolio" onclick="switchTab('portfolio')">
+                        <i class="fas fa-briefcase"></i> My Portfolio
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-tab="export" onclick="switchTab('export')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-tab="settings" onclick="switchTab('settings')">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab: Top Opportunities -->
+            <div id="opportunities" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-star"></i> Top Domain Opportunities
+                        <button class="btn btn-light btn-sm float-end" onclick="loadOpportunities()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="opportunities-list" class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading opportunities...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Portfolio -->
+            <div id="portfolio" class="tab-content">
+                <div class="portfolio-summary" id="portfolio-summary" style="display:none;">
+                    <div class="row text-center">
+                        <div class="col-md-3 portfolio-stat">
+                            <h4>Total Invested</h4>
+                            <div class="value" id="summary-invested">$0</div>
+                        </div>
+                        <div class="col-md-3 portfolio-stat">
+                            <h4>Est. Value</h4>
+                            <div class="value" id="summary-value">$0</div>
+                        </div>
+                        <div class="col-md-3 portfolio-stat">
+                            <h4>Avg. Score</h4>
+                            <div class="value" id="summary-score">0</div>
+                        </div>
+                        <div class="col-md-3 portfolio-stat">
+                            <h4>Potential ROI</h4>
+                            <div class="value" id="summary-roi">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-briefcase"></i> My Domain Portfolio
+                        <button class="btn btn-light btn-sm float-end" onclick="loadPortfolio()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="portfolio-list" class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading portfolio...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Export -->
+            <div id="export" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-download"></i> Export Data
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h5><i class="fas fa-file-csv"></i> Portfolio Export</h5>
+                                <p class="text-muted">Download your portfolio as CSV file</p>
+                                <button class="btn btn-primary" onclick="exportPortfolio()">
+                                    <i class="fas fa-download"></i> Export Portfolio
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h5><i class="fas fa-file-csv"></i> All Domains</h5>
+                                <p class="text-muted">Export all analyzed domains</p>
+                                <button class="btn btn-primary" onclick="exportAllDomains()">
+                                    <i class="fas fa-download"></i> Export All Domains
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-file-csv"></i> Top Opportunities</h5>
+                                <p class="text-muted">Export top scoring domains (min score: 70)</p>
+                                <button class="btn btn-primary" onclick="exportTopOpportunities()">
+                                    <i class="fas fa-download"></i> Export Top Opportunities
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Settings -->
+            <div id="settings" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cog"></i> Settings
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>API Configuration</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">API Base URL</label>
+                                    <input type="text" class="form-control" id="api-url" placeholder="http://localhost:8000">
+                                </div>
+                                <button class="btn btn-primary" onclick="saveSettings()">
+                                    <i class="fas fa-save"></i> Save Settings
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>System Information</h5>
+                                <div id="system-info">
+                                    <div class="loading">
+                                        <p>Loading system info...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><i class="fas fa-heart"></i> Built with ❤️ for domain investors</p>
+        <p><small>Domain Finder Pro © 2025 - Automated Domain Discovery & Investment Analysis</small></p>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Configuration
+        const API_URL = localStorage.getItem('apiUrl') || 'http://localhost:8000';
+
+        // Helper Functions
+        function showLoading(id) {
+            document.getElementById(id).innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
+        }
+
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tab).classList.add('active');
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+            // Load data for tab
+            if (tab === 'opportunities') loadOpportunities();
+            if (tab === 'portfolio') loadPortfolio();
+            if (tab === 'settings') loadSystemInfo();
+        }
+
+        // Load Top Opportunities
+        async function loadOpportunities() {
+            showLoading('opportunities-list');
+            try {
+                const response = await fetch(`${API_URL}/api/domains/top-opportunities?limit=20`);
+                if (!response.ok) throw new Error('Failed to load opportunities');
+
+                const data = await response.json();
+                const opportunities = data.domains || [];
+
+                let html = '';
+                if (opportunities.length === 0) {
+                    html = '<p class="text-muted text-center">No opportunities available yet. Run the scraper first.</p>';
+                } else {
+                    opportunities.forEach(domain => {
+                        const grade = getGrade(domain.quality_score);
+                        html += `
+                            <div class="domain-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="domain-name">${domain.domain}</div>
+                                        <span class="grade-badge grade-${grade.toLowerCase()}">${grade}</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" onclick="addToPortfolio(${domain.id}, '${domain.domain}')">
+                                        <i class="fas fa-plus"></i> Add to Portfolio
+                                    </button>
+                                </div>
+                                <div class="domain-info">
+                                    <div class="info-item">
+                                        <span class="info-label">Score</span>
+                                        <span class="info-value">${domain.quality_score.toFixed(1)}/100</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Backlinks</span>
+                                        <span class="info-value">${domain.backlinks}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Age (Years)</span>
+                                        <span class="info-value">${(domain.age_years || 0).toFixed(1)}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Est. Value</span>
+                                        <span class="info-value">$${domain.estimated_value.high.toLocaleString()}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">ROI</span>
+                                        <span class="info-value roi-badge" style="display: inline-block;">${domain.roi_estimate || 0}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('opportunities-list').innerHTML = html;
+                document.getElementById('total-domains').textContent = opportunities.length;
+
+            } catch (error) {
+                console.error('Error loading opportunities:', error);
+                document.getElementById('opportunities-list').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Error loading opportunities: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Load Portfolio
+        async function loadPortfolio() {
+            showLoading('portfolio-list');
+            try {
+                const response = await fetch(`${API_URL}/api/portfolio`);
+                if (!response.ok) throw new Error('Failed to load portfolio');
+
+                const data = await response.json();
+                const portfolio = data.items || [];
+                const summary = data.summary || {};
+
+                // Update summary
+                if (portfolio.length > 0) {
+                    document.getElementById('portfolio-summary').style.display = 'block';
+                    document.getElementById('summary-invested').textContent = `$${summary.total_invested.toLocaleString()}`;
+                    document.getElementById('summary-value').textContent = `$${summary.estimated_value.toLocaleString()}`;
+                    document.getElementById('summary-score').textContent = summary.average_quality_score.toFixed(1);
+                    document.getElementById('summary-roi').textContent = `${summary.potential_roi_percent.toFixed(1)}%`;
+                }
+
+                // Update stats
+                document.getElementById('portfolio-count').textContent = portfolio.length;
+                document.getElementById('portfolio-roi').textContent = `${summary.potential_roi_percent || 0}%`;
+                document.getElementById('portfolio-value').textContent = `$${(summary.estimated_value || 0).toLocaleString()}`;
+
+                let html = '';
+                if (portfolio.length === 0) {
+                    html = '<p class="text-muted text-center">No domains in portfolio yet. Add some from the opportunities tab!</p>';
+                } else {
+                    html = `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Domain</th>
+                                    <th>Purchase Price</th>
+                                    <th>Score</th>
+                                    <th>Est. Value</th>
+                                    <th>ROI</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    portfolio.forEach(item => {
+                        const grade = getGrade(item.quality_score);
+                        html += `
+                            <tr>
+                                <td><strong>${item.domain}</strong></td>
+                                <td>$${item.purchase_price || 'N/A'}</td>
+                                <td><span class="grade-badge grade-${grade.toLowerCase()}">${grade}</span></td>
+                                <td>$${item.estimated_value.toLocaleString()}</td>
+                                <td>${item.roi_percent.toFixed(1)}%</td>
+                                <td><span class="badge bg-info">${item.status}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="removeFromPortfolio(${item.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `</tbody></table>`;
+                }
+
+                document.getElementById('portfolio-list').innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading portfolio:', error);
+                document.getElementById('portfolio-list').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Error loading portfolio: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Add to Portfolio
+        async function addToPortfolio(domainId, domainName) {
+            const purchasePrice = prompt(`Enter purchase price for ${domainName} (or leave blank):`, '');
+            if (purchasePrice === null) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/portfolio`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `domain_id=${domainId}&purchase_price=${purchasePrice || 0}`
+                });
+
+                if (response.ok) {
+                    alert('Domain added to portfolio!');
+                    loadPortfolio();
+                } else {
+                    alert('Error adding domain to portfolio');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding domain to portfolio');
+            }
+        }
+
+        // Remove from Portfolio
+        async function removeFromPortfolio(itemId) {
+            if (!confirm('Remove this domain from portfolio?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/portfolio/${itemId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Domain removed from portfolio');
+                    loadPortfolio();
+                } else {
+                    alert('Error removing domain');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error removing domain');
+            }
+        }
+
+        // Export Functions
+        function exportPortfolio() {
+            window.location.href = `${API_URL}/api/portfolio/export`;
+        }
+
+        function exportAllDomains() {
+            window.location.href = `${API_URL}/api/domains/export`;
+        }
+
+        function exportTopOpportunities() {
+            window.location.href = `${API_URL}/api/domains/export/top`;
+        }
+
+        // Settings
+        async function loadSystemInfo() {
+            try {
+                const response = await fetch(`${API_URL}/api/health`);
+                const data = await response.json();
+                document.getElementById('system-info').innerHTML = `
+                    <ul class="list-unstyled">
+                        <li><strong>Status:</strong> <span class="badge bg-success">${data.data?.app_name || 'OK'}</span></li>
+                        <li><strong>Version:</strong> ${data.data?.version || 'N/A'}</li>
+                        <li><strong>Last Check:</strong> ${new Date().toLocaleString()}</li>
+                    </ul>
+                `;
+            } catch (error) {
+                document.getElementById('system-info').innerHTML = `
+                    <div class="alert alert-danger">Unable to connect to API</div>
+                `;
+            }
+        }
+
+        function saveSettings() {
+            const apiUrl = document.getElementById('api-url').value;
+            if (apiUrl) {
+                localStorage.setItem('apiUrl', apiUrl);
+                alert('Settings saved!');
+            }
+        }
+
+        // Utility Functions
+        function getGrade(score) {
+            if (score >= 85) return 'A';
+            if (score >= 70) return 'B';
+            if (score >= 55) return 'C';
+            if (score >= 40) return 'D';
+            if (score >= 25) return 'E';
+            return 'F';
+        }
+
+        // Initialize
+        document.getElementById('api-url').value = API_URL;
+        loadOpportunities();
+    </script>
+</body>
+</html>
